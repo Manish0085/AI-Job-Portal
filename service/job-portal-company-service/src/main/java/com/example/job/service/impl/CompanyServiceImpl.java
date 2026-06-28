@@ -51,9 +51,11 @@ public class CompanyServiceImpl implements CompanyService {
             throw new IllegalArgumentException("Company email already exists.");
         }
 
+        String slug = generateUniqueSlug(request.getName());
+
         Company company = Company.builder()
                 .name(request.getName())
-                .slug(request.getSlug())
+                .slug(slug)
                 .tagline(request.getTagline())
                 .description(request.getDescription())
                 .logoUrl(request.getLogoUrl())
@@ -65,7 +67,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .companyType(request.getCompanyType())
                 .industryType(request.getIndustryType())
                 .registerNumber(request.getRegisterNumber())
-                .socialLinks(SocialLinkMapper.toEntityList(request.getSocialLinks()))
+//                .socialLinks(SocialLinkMapper.toEntityList(request.getSocialLinks()))
                 .ownerId(ownerId)
                 .companyStatus(CompanyStatus.ACTIVE)
                 .active(true)
@@ -74,6 +76,26 @@ public class CompanyServiceImpl implements CompanyService {
         Company savedCompany = companyRepository.save(company);
 
         return CompanyMapper.toDTO(savedCompany);
+    }
+
+    private String generateUniqueSlug(String name) {
+
+        String base = name.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .trim()
+                .replaceAll("[\\s-]+", "-");
+
+        if (!companyRepository.existsBySlug(base)) {
+            return base;
+        }
+
+        int counter = 1;
+
+        while (companyRepository.existsBySlug(base + "-" + counter)) {
+            counter++;
+        }
+
+        return base + "-" + counter;
     }
 
     @Override
