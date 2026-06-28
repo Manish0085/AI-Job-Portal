@@ -32,6 +32,9 @@ public class Company extends BaseEntity {
     @Column(unique = true)
     private String slug;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     private String tagline;
 
     @Column(length = 2000)
@@ -44,6 +47,9 @@ public class Company extends BaseEntity {
     private String website;
 
     private Integer foundedYear;
+
+
+    private boolean isVerified = false;
 
     @Enumerated(EnumType.STRING)
     private CompanySize companySize;
@@ -64,7 +70,8 @@ public class Company extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String ownerId;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private List<SocialLink> socialLinks = new ArrayList<>();
 
     private Boolean active = true;
